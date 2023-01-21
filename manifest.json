@@ -4,5 +4,6 @@
         "sha": "",
         "date": ""
     },
-    "ignoreOnUpdate": ["app", "routes"]
+    "ignoreOnUpdate": ["app", "routes"],
+    "deleteBeforeUpdate": true
 }
