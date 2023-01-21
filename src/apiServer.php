@@ -11,7 +11,7 @@ class apiServer extends arion
         header("Access-Control-Allow-Methods: OPTIONS,GET,POST,PUT,DELETE");
         header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, Auth-Key");
         header("Content-Type: application/json; charset=UTF-8");
-        //
+        // get header data
         $_HEADER['method'] = $_SERVER["REQUEST_METHOD"];
         $headers = apache_request_headers();
         foreach ($headers as $header => $value) {
