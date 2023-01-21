@@ -1,6 +1,6 @@
 {
     "version": "0.0.1",
-    "updated": ["*"],
+    "updated": ["modules/api-server"],
     "commit": {
         "sha": "8d9ac019438b05de82749ac169e2a5d70e5355f0",
         "date": "2023-01-21T14:43:04Z"
