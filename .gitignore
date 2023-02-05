@@ -1,3 +1,28 @@
+# Arion
+*/config/*.yml
+
+# Jw
+*.scss
+*.psd
+*backup*
+*-bk*
+*copy*
+*scss*
+*.vscode*
+.DS_Store
+package-lock.json
+
+# React, Cordova
+platforms/
+node_modules/
+cert/
+plugins/
+*zipalign*
+*keystore*
+android/
+ios/
+__tests__/
+
 # Compiled source #
 ###################
 *.com
@@ -30,32 +55,6 @@
 .Trashes
 ehthumbs.db
 Thumbs.db
-
-# Extensions
-*.scss
-*.psd
-*backup*
-*-bk*
-*copy*
-*scss*
-*.vscode*
-
-# React, Cordova
-platforms/
-node_modules/
-cert/
-plugins/
-*zipalign*
-*keystore*
-android/
-ios/
-__tests__/
-
-# Appixar
-package-lock.json
-/vendor/
-database.yml
-upload/
 
 # Others
 scripts/flow/*/.flowconfig

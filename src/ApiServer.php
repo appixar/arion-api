@@ -1,5 +1,5 @@
 <?php
-class apiServer extends arion
+class ApiServer extends Arion
 {
     public function __construct($key = 0)
     {

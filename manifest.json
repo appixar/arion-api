@@ -4,6 +4,8 @@
         "sha": "",
         "date": ""
     },
-    "ignoreOnUpdate": ["app", "routes"],
+    "type": "module",
+    "dependencies": ["mysql"],
+    "ignoreOnUpdate": ["config", "routes"],
     "deleteBeforeUpdate": true
 }

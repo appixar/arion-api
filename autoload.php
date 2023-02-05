@@ -1,5 +1,3 @@
 <?php
-require("src/apiServer.php");
-require("src/apiServer.http.php");
-require("src/apiServer.auth.php");
-require("src/license.array.php");
+require(__DIR__ . "/class/ApiServer.php");
+require(__DIR__ . "/class/ApiServer.http.php");

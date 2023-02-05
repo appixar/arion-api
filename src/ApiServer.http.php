@@ -1,8 +1,6 @@
 <?php
 
-use Symfony\Component\Yaml\Yaml;
-
-class http extends arion
+class http extends ApiServer
 {
     public function __construct()
     {
@@ -16,8 +14,11 @@ class http extends arion
         // AUTH MODULE
         $module = @$_APP['API_SERVER']['AUTH_MODULE'];
         if ($module) {
-            arion::module($module);
-            $res = new $module($rules);
+            try {
+                $res = new $module($rules);
+            } catch (Error $e) {
+                http::die(406, "Auth module not found: $module");
+            }
             return $res;
         }
     }
@@ -52,21 +53,26 @@ class http extends arion
         $class = explode(':', $conf['module'])[0];
 
         // LOAD ROUTE MODULE
-        arion::module($class);
+        //arion::module($class);
+        try {
+            $mod = new $class();
+        } catch (Error $e) {
+            http::die(406, "Class not found: $class");
+        }
 
-        // GET ROUTE MODULE::FUNCTION NAME
+        // EXPLICIT FUNCTION = ROUTE MODULE::FUNCTION NAME
         $function = @explode(':', $conf['module'])[1];
-        if (!$function) {
-            // SMART FUNCTION = URL/ROUTE/SMART_FUNCTION
-            if (@$_PAR[0]) {
-                //$smartFunction = $_PAR[0] . ucfirst(low($_HEADER['method'])); // DEPRECATED: CHECK $_METHOD INSIDE FUNCTION
-                $smartFunction = $_PAR[0];
-                if (method_exists($class, $smartFunction)) $function = $smartFunction;
-            } else $function = low($_HEADER['method']);
+        if ($function) $function = low($_HEADER['method']);
+        // ENDPOINT FUNCTION = URL/ROUTE/SMART_FUNCTION
+        elseif (@$_PAR[0]) {
+            $endpointFunction = $_PAR[0];
+            $endpointFunction = str_replace("-", "_", $endpointFunction);
+            if (method_exists($class, $endpointFunction)) $function = $endpointFunction;
         }
 
         // SECUTIRY CHECK
         // CHECK PERMISSION TO ROUTE (CLASS/FUNCTION) IN AUTH MODE
+        /*
         $module = @$_APP['API_SERVER']['AUTH_MODULE'];
         if ($module) {
             arion::module($module);
@@ -74,15 +80,19 @@ class http extends arion
                 $check = $module::license($class, $function);
                 if (!$check) http::die(405, 'Denied');
             }
-        }
+        }*/
 
-        // RUN ROUTE MODULE, AFTER SECUTIRY CHECK
-        $mod = new $class();
         // Return
-        if ($mod->$function($data)) {
-            if (@$mod->return) http::success($mod->return);
-            else http::success();
-        } else http::die(406, $mod->error);
+        if ($function) {
+            if (@$mod->$function($data)) {
+                if (@$mod->return) http::success($mod->return);
+                else http::success();
+            } else {
+                if (!@$mod->error) $mod->error = "Badly formatted return";
+                http::die(406, $mod->error);
+            }
+        }
+        else http::die(406, "Empty module function");
     }
     public static function get($params = "")
     {
@@ -140,9 +150,9 @@ class http extends arion
         if ($num == 400) $str = 'Bad request';
         if ($num == 401) $str = 'Unauthorized';
         if ($num == 404) $str = 'Not found';
-        if ($num == 405) $str = 'Method Not Allowed';
-        if ($num == 406) $str = 'Error in Route';
-        if (@$_APP['API_SERVER']['DYNAMIC_HEADER_STATUS'] === true) header("HTTP/1.1 $num $str");
+        if ($num == 405) $str = 'Method not allowed';
+        if ($num == 406) $str = 'Module fatal error';
+        if (@!$_APP['API_SERVER']['ALWAYS_200'] === true) header("HTTP/1.1 $num $str");
         else header("HTTP/1.1 200");
         if ($msg) $str = addslashes(strip_tags($msg));
         $json = json_encode(array(
