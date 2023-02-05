@@ -1,5 +1,5 @@
 # Arion
-config/*
+config/*.yml
 
 # Jw
 *.scss
