@@ -1,5 +1,5 @@
 <?php
-class apiserver extends Mason
+class apiserver_ extends Mason
 {
     public function __construct()
     {
