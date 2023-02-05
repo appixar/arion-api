@@ -6,6 +6,5 @@
     },
     "type": "module",
     "dependencies": ["mysql"],
-    "ignoreOnUpdate": ["config", "routes"],
-    "deleteBeforeUpdate": true
+    "ignoreOnUpdate": ["config", "routes"]
 }
