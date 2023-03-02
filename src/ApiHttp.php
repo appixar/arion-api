@@ -1,6 +1,6 @@
 <?php
 
-class http extends ApiServer
+class ApiHttp extends Api
 {
     public function __construct()
     {
@@ -27,7 +27,7 @@ class http extends ApiServer
         global $_AUTH, $_APP, $_HEADER, $_PAR;
 
         // DEFAULT CONF
-        if (!@$conf['module']) http::die(406, 'Module not found');
+        if (!@$conf['controller']) http::die(406, 'Route controller not found');
         if (!@$conf['data']) $conf['data'] = 'body';
 
         // DATA FROM BODY OR POST?
@@ -50,25 +50,23 @@ class http extends ApiServer
         if (!empty($_GET)) $data = $_GET;
 
         // GET ROUTE MODULE NAME
-        $class = explode(':', $conf['module'])[0];
+        $class = explode(':', $conf['controller'])[0];
 
         // LOAD ROUTE MODULE
-        //arion::module($class);
         try {
             $mod = new $class();
         } catch (Error $e) {
             http::die(406, "Class not found: $class");
         }
-
         // EXPLICIT FUNCTION = ROUTE MODULE::FUNCTION NAME
-        $function = @explode(':', $conf['module'])[1];
-        if ($function) $function = low($_HEADER['method']);
+        $function = @explode(':', $conf['controller'])[1];
         // ENDPOINT FUNCTION = URL/ROUTE/SMART_FUNCTION
-        elseif (@$_PAR[0]) {
+        if (!$function and @$_PAR[0]) {
             $endpointFunction = $_PAR[0];
             $endpointFunction = str_replace("-", "_", $endpointFunction);
             if (method_exists($class, $endpointFunction)) $function = $endpointFunction;
         }
+        elseif (!$function) $function = low($_HEADER['method']);
 
         // SECUTIRY CHECK
         // CHECK PERMISSION TO ROUTE (CLASS/FUNCTION) IN AUTH MODE
@@ -92,7 +90,7 @@ class http extends ApiServer
                 http::die(406, $mod->error);
             }
         }
-        else http::die(406, "Empty module function");
+        else http::die(406, "Empty controller function");
     }
     public static function get($params = "")
     {
@@ -151,7 +149,7 @@ class http extends ApiServer
         if ($num == 401) $str = 'Unauthorized';
         if ($num == 404) $str = 'Not found';
         if ($num == 405) $str = 'Method not allowed';
-        if ($num == 406) $str = 'Module fatal error';
+        if ($num == 406) $str = 'Controller fatal error';
         if (@!$_APP['API_SERVER']['ALWAYS_200'] === true) header("HTTP/1.1 $num $str");
         else header("HTTP/1.1 200");
         if ($msg) $str = addslashes(strip_tags($msg));
